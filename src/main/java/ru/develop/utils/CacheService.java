@@ -12,7 +12,6 @@ import java.lang.reflect.Method;
 @Slf4j
 public class CacheService<T> {
 
-    private static Method cacheMethod;
     public CacheService(){};
     public static <T> Fractionable cache(T cls){
         Class<?> inClass = cls.getClass();
@@ -22,36 +21,31 @@ public class CacheService<T> {
         for(Method m: methods){
             for (Annotation declaredAnnotation : m.getDeclaredAnnotations()) {
                 if(m.isAnnotationPresent(Cache.class)){
-                    cacheMethod = m;
+                    return new OverrideClass((Fractionable)cls);
                 }
             }
         }
-        return new OverrideClass(cacheMethod,(Fractionable)cls);
+        return (Fractionable)cls;
     }
 
 
 
     private static class OverrideClass implements Fractionable{
-        Method backupMethod;
         Fractionable backupCls;
         boolean firstCall = false;
         double valueMethod;
 
-        public OverrideClass(Method backupMethod,Fractionable backupCls){
-            this.backupMethod = backupMethod;
+        private int num;
+        private int denum;
+
+        public OverrideClass(Fractionable backupCls){
             this.backupCls = backupCls;
         }
         @Override
         public double doubleValue() {
             if(firstCall == false){
-                try {
-                    firstCall = true;
-                    return valueMethod = (double)backupMethod.invoke(backupCls);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                } catch (InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
+                firstCall = true;
+                return valueMethod=backupCls.doubleValue();
             }
             System.out.println("i am OVERRIDE method");
             log.info(String.format("my value: %f",valueMethod));
@@ -60,11 +54,14 @@ public class CacheService<T> {
 
         @Override
         public void setNum(int num) {
-
+            backupCls.setNum(num);
+            firstCall = false;
         }
 
         @Override
         public void setDenum(int denum) {
+            backupCls.setDenum(denum);
+            firstCall = false;
         }
     };
 }

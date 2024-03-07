@@ -15,5 +15,15 @@ public class TestingTask {
         Fractionable f2 = CacheService.cache(f);
         Assertions.assertEquals(f2.doubleValue(),f2.doubleValue());
 
+        f2.doubleValue();
+        f2.setNum(6);
+        f2.doubleValue();
+        f2.doubleValue();
+        f2.doubleValue();
+        f2.setDenum(3);
+        f2.doubleValue();
+        f2.doubleValue();
+        f2.doubleValue();
+        Assertions.assertEquals(f2.doubleValue(),f2.doubleValue());
     }
 }

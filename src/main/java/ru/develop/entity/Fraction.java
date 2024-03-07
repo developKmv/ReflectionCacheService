@@ -16,6 +16,7 @@ public class Fraction implements Fractionable{
     @Override
     @Mutator
     public void setNum(int num) {
+        if (num==0)throw new IllegalArgumentException();
         this.num = num;
     }
 
