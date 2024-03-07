@@ -5,25 +5,29 @@ import ru.develop.entity.Fraction;
 import ru.develop.entity.Fractionable;
 import ru.develop.utils.CacheService;
 
+import java.lang.reflect.Proxy;
+
 @Slf4j
 public class TestingTask {
 
 
     @Test
     public void testCache(){
-        Fraction f =new Fraction(4,2);
-        Fractionable f2 = CacheService.cache(f);
-        Assertions.assertEquals(f2.doubleValue(),f2.doubleValue());
 
-        f2.doubleValue();
-        f2.setNum(6);
-        f2.doubleValue();
-        f2.doubleValue();
-        f2.doubleValue();
-        f2.setDenum(3);
-        f2.doubleValue();
-        f2.doubleValue();
-        f2.doubleValue();
-        Assertions.assertEquals(f2.doubleValue(),f2.doubleValue());
+        Fraction f3 = new Fraction(4,2);
+        Fractionable proxyF5 = CacheService.cache(f3);
+        proxyF5.doubleValue();
+
+        Assertions.assertEquals(f3.doubleValue(),proxyF5.doubleValue());
+
+        log.info(String.valueOf(Double.valueOf(proxyF5.doubleValue())));
+        log.info(String.valueOf(Double.valueOf(proxyF5.doubleValue())));
+
+        proxyF5.setNum(6);
+        proxyF5.doubleValue();
+
+        log.info(String.valueOf(Double.valueOf(proxyF5.doubleValue())));
+        log.info(String.valueOf(Double.valueOf(proxyF5.doubleValue())));
+
     }
 }

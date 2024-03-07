@@ -3,65 +3,41 @@ package ru.develop.utils;
 import lombok.extern.slf4j.Slf4j;
 import ru.develop.entity.Fractionable;
 import ru.develop.my.annotations.Cache;
+import ru.develop.my.annotations.Mutator;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
+
 
 @Slf4j
-public class CacheService<T> {
+public class CacheService<T> implements InvocationHandler {
 
-    public CacheService(){};
-    public static <T> Fractionable cache(T cls){
-        Class<?> inClass = cls.getClass();
-        Method[] methods = inClass.getMethods();
-        Field[] fields = cls.getClass().getDeclaredFields();
+    private T o;
+    private Double cacheValue;
+    public CacheService(T o){
+        this.o = o;
+    };
 
-        for(Method m: methods){
-            for (Annotation declaredAnnotation : m.getDeclaredAnnotations()) {
-                if(m.isAnnotationPresent(Cache.class)){
-                    return new OverrideClass((Fractionable)cls);
-                }
-            }
-        }
-        return (Fractionable)cls;
+    public static <T> T cache(T in){
+        ClassLoader classLoader = in.getClass().getClassLoader();
+        Class[] interfaces = in.getClass().getInterfaces();
+        T out = (T) Proxy.newProxyInstance(classLoader,interfaces,new CacheService<>(in));
+        return out;
     }
 
-
-
-    private static class OverrideClass implements Fractionable{
-        Fractionable backupCls;
-        boolean firstCall = false;
-        double valueMethod;
-
-        private int num;
-        private int denum;
-
-        public OverrideClass(Fractionable backupCls){
-            this.backupCls = backupCls;
-        }
-        @Override
-        public double doubleValue() {
-            if(firstCall == false){
-                firstCall = true;
-                return valueMethod=backupCls.doubleValue();
-            }
-            System.out.println("i am OVERRIDE method");
-            log.info(String.format("my value: %f",valueMethod));
-            return valueMethod;
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        if(method.isAnnotationPresent(Cache.class) && cacheValue ==null){
+            return cacheValue = (Double) method.invoke((Fractionable)o,args);
+        }else if (method.isAnnotationPresent(Cache.class) && cacheValue !=null){
+            return cacheValue;
         }
 
-        @Override
-        public void setNum(int num) {
-            backupCls.setNum(num);
-            firstCall = false;
+
+        if(method.isAnnotationPresent(Mutator.class)){
+            cacheValue = null;
         }
 
-        @Override
-        public void setDenum(int denum) {
-            backupCls.setDenum(denum);
-            firstCall = false;
-        }
-    };
+        return method.invoke((Fractionable)o,args);
+    }
+
 }
