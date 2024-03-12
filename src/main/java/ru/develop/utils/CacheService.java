@@ -44,7 +44,7 @@ public class CacheService<T> implements InvocationHandler {
                 cacheValue = null;
             }
         }
-        return method.invoke((Fractionable)o,args);
+        return method.invoke(o,args);
     }
 
 }
