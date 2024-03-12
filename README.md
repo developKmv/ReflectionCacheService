@@ -1,4 +1,4 @@
-<h1>Resolution<h1>
+<h1>Resolution</h1>
 <img src="res.png"></img>
 
 
