@@ -37,7 +37,7 @@ public class CacheService<T> implements InvocationHandler {
         Method[] basicMethods = o.getClass().getMethods();
         for(Method m: basicMethods){
             if(m.getName()== method.getName() && m.isAnnotationPresent(Cache.class) && cacheValue == null){
-                return cacheValue = (Double) m.invoke((Fractionable)o,args);
+                return cacheValue = (Double) m.invoke(o,args);
             }else if(m.getName()== method.getName() && m.isAnnotationPresent(Cache.class) && cacheValue != null){
                 return cacheValue;
             }else if(m.getName()== method.getName() && m.isAnnotationPresent(Mutator.class)){
